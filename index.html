@@ -1,1 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氣泡排序法 (Bubble Sort) 動態示範 - 數字排序</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1,h2 { color: #333; }
+        #visualization { 
+            margin-top: 20px;
+            display: flex;
+            align-items: flex-end;
+            height: 250px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: linear-gradient(180deg, #f0f8ff 0%, #e6f7ff 100%);
+        }
+        .bar {
+            background-color: #4CAF50;
+            color: white;
+            margin: 0 4px;
+            text-align: center;
+            vertical-align: bottom;
+            font-size: 14px;
+            width: 40px;
+            transition: all 0.3s ease;
+        }
+        .highlight { background-color: #f39c12 !important; }
+        .swap { background-color: #e74c3c !important; }
+        #code {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>氣泡排序法（Bubble Sort）</h1>
+    <p>氣泡排序是一種簡單的比較式排序演算法，它反覆地在待排序序列中從頭到尾進行多次對比和交換。每次遍歷都會把較大的元素 "冒泡" 到序列的末端，因此最終會將資料按照 <strong>由小到大</strong> 的順序排列。</p>
 
+    <h2>演算法步驟</h2>
+    <ol>
+        <li>從第一個元素開始，逐一比較相鄰的兩個元素。</li>
+        <li>若前者比後者大，則交換兩者位置。</li>
+        <li>繼續對後面的元素進行同樣動作，完成一次遍歷最多可將一個最大元素移到最右端。</li>
+        <li>重複以上過程，忽略已排序好的末端部分，直到整個序列有序。</li>
+    </ol>
+
+    <h2 id="demo-title">數字排序動畫示範</h2>
+    <p id="description">下方展示了一組隨機整數如何利用氣泡排序逐步由小到大排列。可使用控制按鈕暫停、步進或重新生成資料，並切換語言閱讀說明。</p>
+    <label for="langSelect" id="langLabel">語言：</label>
+    <select id="langSelect">
+        <option value="zh" selected>中文</option>
+        <option value="en">English</option>
+    </select>
+    <div id="visualization"></div>
+    <button id="startBtn">開始排序</button>
+    <button id="pauseBtn" style="margin-left:10px;">暫停</button>
+    <button id="stepBtn" style="margin-left:10px;">步進</button>
+    <button id="resetBtn" style="margin-left:10px;">重新生成陣列</button>
+
+    <h2>程式碼</h2>
+    <pre id="code">
+// 雙迴圈氣泡排序示範，將數字由小到大排序
+// 使用範例：
+// let arr = [34, 7, 23, 32, 5, 62, 14];
+// bubbleSort(arr, visualize);
+function bubbleSort(arr, visualize) {
+    let n = arr.length;
+    let swapped;
+    do {
+        swapped = false;
+        for (let i = 0; i < n - 1; i++) {
+            visualize(i, i + 1);
+            if (arr[i] > arr[i + 1]) {
+                // 交換位置
+                [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+                swapped = true;
+                visualize(i, i + 1, true);
+            }
+        }
+        n--; // 最右邊數值已經就定位
+    } while (swapped);
+}
+    </pre>
+
+    <h2>應用簡述</h2>
+    <p>氣泡排序屬於穩定排序演算法，實作簡單但在大型數據集上效率較低。以下是常見應用的簡要說明：</p>
+    <ul>
+        <li>教學用途：用於說明基本排序概念和演算法步驟。</li>
+        <li>小型資料集：當資料量很小且開發時間為主要考量時。</li>
+        <li>嵌入式/初級系統：在記憶體受限且程式碼簡潔時。</li>
+    </ul>
+
+    <script>
+        const container = document.getElementById('visualization');
+        const startBtn = document.getElementById('startBtn');
+        // 一組範例數字，可自行調整或隨機生成
+        let numbers = [34, 7, 23, 32, 5, 62, 14];
+        let bars = [];
+
+        function render() {
+            container.innerHTML = '';
+            bars = numbers.map(val => {
+                const div = document.createElement('div');
+                div.className = 'bar';
+                div.style.height = (val * 3 + 20) + 'px'; // 高度依據數值
+                div.textContent = val;
+                container.appendChild(div);
+                return div;
+            });
+        }
+
+        function visualize(i, j, swapped = false) {
+            bars.forEach(b => b.classList.remove('highlight', 'swap'));
+            bars[i].classList.add(swapped ? 'swap' : 'highlight');
+            bars[j].classList.add(swapped ? 'swap' : 'highlight');
+            render();
+        }
+
+        // State for manual step-through
+        let sorting = false;
+        let i = 0, n = numbers.length, swapped = false;
+
+        function nextStep() {
+            if (n <= 1) return;
+            if (i < n - 1) {
+                visualize(i, i+1);
+                if (numbers[i] > numbers[i+1]) {
+                    [numbers[i], numbers[i+1]] = [numbers[i+1], numbers[i]];
+                    swapped = true;
+                    visualize(i, i+1, true);
+                }
+                i++;
+            } else {
+                if (!swapped) {
+                    sorting = false;
+                    return;
+                }
+                n--;
+                i = 0;
+                swapped = false;
+                nextStep();
+            }
+        }
+
+        let intervalId;
+        startBtn.addEventListener('click', () => {
+            if (sorting) return;
+            sorting = true;
+            intervalId = setInterval(() => {
+                nextStep();
+                render();
+                if (!sorting) clearInterval(intervalId);
+            }, 500);
+        });
+        const pauseBtn = document.getElementById('pauseBtn');
+        pauseBtn.addEventListener('click', () => {
+            sorting = false;
+            clearInterval(intervalId);
+        });
+        const stepBtn = document.getElementById('stepBtn');
+        stepBtn.addEventListener('click', () => {
+            if (!sorting) {
+                nextStep();
+                render();
+            }
+        });
+        const resetBtn = document.getElementById('resetBtn');
+        resetBtn.addEventListener('click', () => {
+            numbers = Array.from({length: 7}, () => Math.floor(Math.random()*100));
+            i = 0; n = numbers.length; swapped = false; sorting = false;
+            clearInterval(intervalId);
+            render();
+        });
+
+        // language switcher
+        const langSelect = document.getElementById('langSelect');
+        const langLabel = document.getElementById('langLabel');
+        const demoTitle = document.getElementById('demo-title');
+        const description = document.getElementById('description');
+        function updateLanguage() {
+            if (langSelect.value === 'en') {
+                langLabel.textContent = 'Language:';
+                demoTitle.textContent = 'Numeric Sorting Demo';
+                description.textContent = 'Below you can see a random set of integers being sorted from smallest to largest using bubble sort. Use the controls to pause, step, or reset.';
+                startBtn.textContent = 'Start';
+                pauseBtn.textContent = 'Pause';
+                stepBtn.textContent = 'Step';
+                resetBtn.textContent = 'Reset Array';
+            } else {
+                langLabel.textContent = '語言：';
+                demoTitle.textContent = '數字排序動畫示範';
+                description.textContent = '下方展示了一組隨機整數如何利用氣泡排序逐步由小到大排列。可使用控制按鈕暫停、步進或重新生成資料，並切換語言閱讀說明。';
+                startBtn.textContent = '開始排序';
+                pauseBtn.textContent = '暫停';
+                stepBtn.textContent = '步進';
+                resetBtn.textContent = '重新生成陣列';
+            }
+        }
+        langSelect.addEventListener('change', updateLanguage);
+        updateLanguage();
+
+        render();
+    </script>
+</body>
+</html>
